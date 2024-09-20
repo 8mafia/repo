@@ -3,11 +3,33 @@
 # Get Ubuntu version codename
 UBUNTU_CODENAME=$(lsb_release -c | awk '{print $2}')
 
-# Backup the current sources list
-sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup
-
 # Set the mirror URL
 MIRROR_URL="http://ubuntu.parsvds.com/ubuntu"
+SECURITY_URL="http://security.ubuntu.parsvds.com/ubuntu"
+
+# Check for the correct source file to back up and modify
+if [[ "$UBUNTU_CODENAME" == "noble" ]]; then
+    SOURCE_FILE="/etc/apt/sources.list.d/ubuntu.sources"
+    BACKUP_FILE="/etc/apt/sources.list.d/ubuntu.sources.backup"
+    if [ -f "$SOURCE_FILE" ]; then
+        sudo cp $SOURCE_FILE $BACKUP_FILE
+        echo "Backup of sources list saved as $BACKUP_FILE"
+    else
+        echo "Source file not found at $SOURCE_FILE"
+        exit 1
+    fi
+else
+    # For older versions, backup the old /etc/apt/sources.list file
+    SOURCE_FILE="/etc/apt/sources.list"
+    BACKUP_FILE="/etc/apt/sources.list.backup"
+    if [ -f "$SOURCE_FILE" ]; then
+        sudo cp $SOURCE_FILE $BACKUP_FILE
+        echo "Backup of sources list saved as $BACKUP_FILE"
+    else
+        echo "Source file not found at $SOURCE_FILE"
+        exit 1
+    fi
+fi
 
 # Update sources list based on Ubuntu version
 case $UBUNTU_CODENAME in
@@ -65,6 +87,23 @@ EOF
 deb $MIRROR_URL future main restricted universe multiverse
 deb $MIRROR_URL future-updates main restricted universe multiverse
 deb $MIRROR_URL future-security main restricted universe multiverse
+EOF
+        ;;
+    noble)
+        echo "Detected Ubuntu (Noble)"
+        # Modify the /etc/apt/sources.list.d/ubuntu.sources file for noble
+        sudo tee $SOURCE_FILE <<EOF
+Types: deb
+URIs: $MIRROR_URL
+Suites: noble noble-updates noble-backports
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+Types: deb
+URIs: $SECURITY_URL
+Suites: noble-security
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
 EOF
         ;;
     *)
