@@ -10,7 +10,7 @@ SECURITY_URL="http://security.ubuntu.com/ubuntu/"
 # Check for the correct source file to back up and modify
 if [[ "$UBUNTU_CODENAME" == "noble" ]]; then
     SOURCE_FILE="/etc/apt/sources.list.d/ubuntu.sources"
-    BACKUP_FILE="/etc/apt/sources.list.d/ubuntu.sources.backup"
+    BACKUP_FILE="/etc/apt/sources.list.d/ubuntu.sources.backup.orig"
     if [ -f "$SOURCE_FILE" ]; then
         sudo cp $SOURCE_FILE $BACKUP_FILE
         echo "Backup of sources list saved as $BACKUP_FILE"
