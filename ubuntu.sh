@@ -5,7 +5,7 @@ UBUNTU_CODENAME=$(lsb_release -c | awk '{print $2}')
 
 # Set the mirror URL
 MIRROR_URL="http://ubuntu.parsvds.com/ubuntu"
-SECURITY_URL="http://security.ubuntu.parsvds.com/ubuntu"
+SECURITY_URL="http://security.ubuntu.com/ubuntu/"
 
 # Check for the correct source file to back up and modify
 if [[ "$UBUNTU_CODENAME" == "noble" ]]; then
